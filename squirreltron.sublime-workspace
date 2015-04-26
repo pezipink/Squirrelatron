@@ -8,15 +8,6 @@
 	"buffers":
 	[
 		{
-			"file": "/C/Users/ross/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build",
-			"settings":
-			{
-				"buffer_size": 47,
-				"line_ending": "Windows",
-				"name": "untitled.sublime-build"
-			}
-		},
-		{
 			"file": "source/app.d",
 			"settings":
 			{
@@ -25,10 +16,10 @@
 			}
 		},
 		{
-			"file": "dub.json",
+			"file": "squirreltron.sublime-project",
 			"settings":
 			{
-				"buffer_size": 233,
+				"buffer_size": 74,
 				"line_ending": "Unix"
 			}
 		}
@@ -70,14 +61,15 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/ross/Documents/Squirreltron",
-		"/C/Users/ross/Documents/Squirreltron/source"
+		"/F/GIT/Squirrelatron",
+		"/F/GIT/Squirrelatron/source",
+		"/F/GIT/Squirrelatron/source"
 	],
 	"file_history":
 	[
+		"/C/Users/ross/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build",
 		"/C/Users/ross/Documents/DCD/makefile",
-		"/C/Program Files/Sublime Text 3/Packages/D.sublime-package",
-		"/C/Users/ross/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build"
+		"/C/Program Files/Sublime Text 3/Packages/D.sublime-package"
 	],
 	"find":
 	{
@@ -95,6 +87,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"//...\n"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -112,39 +105,11 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/C/Users/ross/AppData/Roaming/Sublime Text 3/Packages/User/DUB.sublime-build",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 47,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								47,
-								47
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "source/app.d",
 					"semi_transient": false,
 					"settings":
@@ -156,38 +121,38 @@
 						"selection":
 						[
 							[
-								1028,
-								1028
+								334,
+								334
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/D/D.tmLanguage",
-							"tab_size": 4,
+							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 66.0,
-						"translation.y": 567.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "dub.json",
-					"semi_transient": true,
+					"buffer": 1,
+					"file": "squirreltron.sublime-project",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 233,
+						"buffer_size": 74,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								173,
-								173
+								40,
+								40
 							]
 						],
 						"settings":
@@ -198,7 +163,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -237,7 +202,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 227.0
+		"height": 137.0
 	},
 	"output.find_results":
 	{
