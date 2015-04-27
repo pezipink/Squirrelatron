@@ -1,12 +1,13 @@
 import derelict.sdl2.sdl;
 import std.stdio;
+import std.algorithm;
 
-enum Direction
+enum Direction : int
 {
 	None = 0,
 	BaseUp 		= 0b0000_0001,
 	BaseDown 	= 0b0000_0010,
-	BaseVet		= 0b0000_0011,
+	BaseVert	= 0b0000_0011,
 	BaseLeft 	= 0b0000_0100,
 	BaseRight 	= 0b0000_1000,
 	BaseHoriz	= 0b0000_1100,
@@ -22,29 +23,22 @@ enum Direction
 }
 
 
-private byte directions = 0;
+private int directions = 0;
 
-bool testDirection(byte dir){
+bool testDirection(int dir){
 	return (dir & directions) == dir;
 }
 
-unittest{
-	directions = Direction.TurretUp | Direction.TurretLeft;
+unittest {
+	directions = Direction.TurretUp | Direction.TurretLeft | Direction.TurretRight;
 	assert(testDirection(Direction.TurretUp));
 	assert(testDirection(Direction.TurretLeft));
 	assert(testDirection(Direction.TurretUp | Direction.TurretLeft));
+	assert(testDirection(Direction.TurretRight));
 	assert(testDirection(Direction.TurretLeft | Direction.TurretDown) == false);
 }
 
-struct InputData
-{
-	Direction HorizontalMovement;
-	Direction VerticalMovement;	
-	Direction HorizontalBullets;
-	Direction VerticalBullets;	
-}
 
-InputData MainInput;
 private SDL_Joystick* joystick;
 private immutable int deadZone = 10000;
 
@@ -52,17 +46,8 @@ Uint8* _keyState;
 
 public bool gameRunning = false;
 void InitializeJoysticks(){
-	MainInput.HorizontalMovement = Direction.None;
-	MainInput.VerticalMovement = Direction.None;
-	MainInput.HorizontalBullets = Direction.None;
-	MainInput.VerticalBullets = Direction.None;
-
 	if(SDL_NumJoysticks() > 0 ) {
 		joystick = SDL_JoystickOpen(0);
-		//for(int i=0; i<SDL_NumJoysticks(); i++) {
-				//_joysticks~=SDL_JoystickOpen(i);
-
-		//}
 		SDL_JoystickEventState(SDL_ENABLE);
 	}
 }
@@ -73,32 +58,33 @@ bool IsKeyDown(SDL_Scancode code){
 			return true;
 	return false;
 }
- auto keyMapping = [0 : 1, 1 : 2];
+
+private string KeyInput() {
+	auto keyMapping = 
+	[
+		"SDL_SCANCODE_RIGHT" : "Direction.BaseRight",
+		"SDL_SCANCODE_LEFT" : "Direction.BaseLeft",
+		"SDL_SCANCODE_UP" : "Direction.BaseUp",
+		"SDL_SCANCODE_DOWN" : "Direction.BaseDown",
+		"SDL_SCANCODE_D" : "Direction.TurretRight",
+		"SDL_SCANCODE_A" : "Direction.TurretLeft",
+		"SDL_SCANCODE_W" : "Direction.TurretUp",
+		"SDL_SCANCODE_S" : "Direction.TurretDown"
+	];
+	string code = "";
+	foreach(k, v; keyMapping){
+		code ~=
+		"if(IsKeyDown("~k~"))
+			directions |= "~v~";
+		 else
+	 		directions &= (directions ^ " ~ v~");
+	 	";
+	 }
+ 	return code;
+ }
+
 private void UpdateKeys(){
-	if( IsKeyDown(SDL_SCANCODE_RIGHT)){
-		directions |= Direction.BaseRight;
-	} else {
-		directions &= (directions ^ Direction.BaseRight);
-	} 
-
-	if (IsKeyDown(SDL_SCANCODE_LEFT)) {
-		directions |= Direction.BaseLeft;
-	}
-	 else 
-	{
-		directions &= (directions ^ Direction.BaseLeft);
-		//directions &= (directions ^ Direction.BaseHoriz);
-		//MainInput.HorizontalMovement = Direction.BaseNone;
-		// 00000000
-		// 
-	}
-
-	//if( IsKeyDown(SDL_SCANCODE_UP) || IsKeyDown(SDL_SCANCODE_W)){
-	//	MainInput.VerticalMovement = Direction.Up;
-	//} else if (IsKeyDown(SDL_SCANCODE_DOWN)) {
-	//	MainInput.VerticalMovement = Direction.Down;
-	//} else {MainInput.VerticalMovement = Direction.None; }
-
+	mixin(KeyInput());
 	if(IsKeyDown(SDL_SCANCODE_ESCAPE)) {
 		gameRunning=false;
 	}
@@ -132,19 +118,19 @@ void Update() {
 	    break;
 
     	case SDL_JOYAXISMOTION:
-		if(event.jaxis.axis == 0) { // left stick horiz 
-			mixin(JoyInput!("MainInput.HorizontalMovement","Direction.BaseRight","Direction.BaseLeft"));
-		}
-		else if(event.jaxis.axis == 1) { // left stick vert
-			mixin(JoyInput!("MainInput.VerticalMovement","Direction.BaseDown","Direction.BaseUp"));
-		}
+		//if(event.jaxis.axis == 0) { // left stick horiz 
+		//	mixin(JoyInput!("MainInput.HorizontalMovement","Direction.BaseRight","Direction.BaseLeft"));
+		//}
+		//else if(event.jaxis.axis == 1) { // left stick vert
+		//	mixin(JoyInput!("MainInput.VerticalMovement","Direction.BaseDown","Direction.BaseUp"));
+		//}
 
-		if(event.jaxis.axis == 2) {// Right stick horiz
-			mixin(JoyInput!("MainInput.HorizontalBullets","Direction.BaseRight","Direction.BaseLeft"));
-		}
-		else if(event.jaxis.axis == 3){ // Right stick vert
-			mixin(JoyInput!("MainInput.VerticalBullets","Direction.BaseDown","Direction.BaseUp"));
-		}
+		//if(event.jaxis.axis == 2) {// Right stick horiz
+		//	mixin(JoyInput!("MainInput.HorizontalBullets","Direction.BaseRight","Direction.BaseLeft"));
+		//}
+		//else if(event.jaxis.axis == 3){ // Right stick vert
+		//	mixin(JoyInput!("MainInput.VerticalBullets","Direction.BaseDown","Direction.BaseUp"));
+		//}
 
 		break;
 
