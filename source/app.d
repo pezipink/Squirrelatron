@@ -6,6 +6,7 @@ import InputHandler;
 import GameObjects;
 import TextureManager;
 import Vector2D;
+import std.path;
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 
@@ -28,7 +29,7 @@ public:
     _window = SDL_CreateWindow("Squirrelatron", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,640,480,SDL_WINDOW_SHOWN);
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
-    TextureManager.Load("F:\\GIT\\Squirrelatron\\images\\ps_temp.jpg", "pezi", _renderer);    
+    TextureManager.Load(buildPath(getcwd(), "..\\images\\ps_temp.jpg"), "pezi", _renderer);    
     SDL_Rect source = TextureManager.GetRect("pezi");
     _pezi = new Player();
     _pezi.Load(0,0,source.w,source.h,"pezi");

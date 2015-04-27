@@ -3,6 +3,17 @@ import InputHandler;
 import Vector2D;
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
+import std.math;
+T MAX(T)(T x, T y) { return x > y ? x : y; }
+T WRAPP(T)(T x, T max) { return x > max ? x-max : x; }
+T WRAPN(T)(T x, T min, T max) { return x < min ? max-abs(x-min) : x; }
+
+unittest {
+	assert(MAX(1,10) == 10);
+	assert(WRAPP(365,360) == 5);
+	assert(WRAPN(-5,0,360) == 355);
+	assert(WRAPN(10,15,360) == 355);
+}
 
 class GameObject
 {
@@ -18,7 +29,7 @@ class GameObject
 		}
 		
 		void Draw(SDL_Renderer* renderer) {
-			TextureManager.DrawFrame(_id,cast(int)_position.X,cast(int)_position.Y,_width,_height,_currentRow,_currentFrame,renderer,SDL_FLIP_NONE);
+			TextureManager.DrawFrame(_id,cast(int)_position.X,cast(int)_position.Y,_width,_height,_angle,_currentRow,_currentFrame,renderer,SDL_FLIP_NONE);
 		}
 
 		void Update()
@@ -38,6 +49,8 @@ class GameObject
 
 		Vector2D _position = new Vector2D(0,0);
 		Vector2D _velocity = new Vector2D(0,0);
+
+		double _angle = 045.0;
 }
 
 class Player : GameObject
@@ -46,15 +59,21 @@ class Player : GameObject
 	{
 		HandleInput();
 		GameObject.Update();
+
 	}
 
 	void HandleInput()
 	{
-		if(MainInput.HorizontalMovement == Direction.Left)
+		_angle = WRAPP(_angle+10,360);
+		if( (Direction.BaseLeft | Direction.BaseRight).testDirection)
+		{
+			//_velocity.X = 0;
+		}
+		else if(Direction.BaseLeft.testDirection)
 		{
 			_velocity.X = -10;
 		}
-		else if(MainInput.HorizontalMovement == Direction.Right)
+		else if(Direction.BaseRight.testDirection)
 		{
 			_velocity.X = 10;
 		}
@@ -63,18 +82,18 @@ class Player : GameObject
 			_velocity.X = 0;
 		}
 
-		if(MainInput.VerticalMovement == Direction.Up)
-		{
-			_velocity.Y = -10;
-		}
-		else if(MainInput.VerticalMovement == Direction.Down)
-		{
-			_velocity.Y = 10;
-		}
-		else 
-		{
-			_velocity.Y = 0;
-		}
+		//if(MainInput.VerticalMovement == Direction.Up)
+		//{
+		//	_velocity.Y = -10;
+		//}
+		//else if(MainInput.VerticalMovement == Direction.Down)
+		//{
+		//	_velocity.Y = 10;
+		//}
+		//else 
+		//{
+		//	_velocity.Y = 0;
+		//}
 
 	}
 }

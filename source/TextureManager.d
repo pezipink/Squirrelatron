@@ -15,7 +15,7 @@ void Load(immutable string file, immutable string id, SDL_Renderer* renderer)
   _textures[id] = tex;
 }
 
-void Draw(immutable string id, int x,int y, int width, int height, SDL_Renderer* renderer, SDL_RendererFlip flip = SDL_FLIP_NONE)
+void Draw(immutable string id, int x,int y, int width, int height, double angle, SDL_Renderer* renderer, SDL_RendererFlip flip = SDL_FLIP_NONE)
 {
   assert(id in _textures);
   SDL_Rect srcRect;
@@ -26,10 +26,10 @@ void Draw(immutable string id, int x,int y, int width, int height, SDL_Renderer*
   srcRect.h = destRect.h = height;
   destRect.x = x;
   destRect.y = y;
-  SDL_RenderCopyEx(renderer, _textures[id], &srcRect, &destRect, 0.0, null, flip);
+  SDL_RenderCopyEx(renderer, _textures[id], &srcRect, &destRect, angle, null, flip);
 }
 
-void DrawFrame(immutable string id, int x, int y, int width, int height, int currentRow, int currentFrame, SDL_Renderer *renderer, SDL_RendererFlip flip)
+void DrawFrame(immutable string id, int x, int y, int width, int height, double angle, int currentRow, int currentFrame, SDL_Renderer *renderer, SDL_RendererFlip flip)
 {
   assert(id in _textures);
   SDL_Rect srcRect;
@@ -40,7 +40,7 @@ void DrawFrame(immutable string id, int x, int y, int width, int height, int cur
   srcRect.h = destRect.h = height;
   destRect.x = x;
   destRect.y = y;
-  SDL_RenderCopyEx(renderer, _textures[id], &srcRect, &destRect, 0.0, null, flip);
+  SDL_RenderCopyEx(renderer, _textures[id], &srcRect, &destRect, angle, null, flip);
 }
 
 SDL_Rect GetRect(immutable string id)
