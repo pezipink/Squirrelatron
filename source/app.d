@@ -51,7 +51,7 @@ public:
   void Update() {
     _pezi.Update();    
     _stars.Update();
-    auto frame = ((SDL_GetTicks() / 1000) % 6);
+    //auto frame = ((SDL_GetTicks() / 1000) % 6);
   };
   
   void HandleEvents()  {
@@ -80,7 +80,10 @@ void main() {
     game.Update();
     game.Render();
     frameTime = SDL_GetTicks() - frameStart;
+    //writeln(SDL_GetTicks());
+    //writeln(frameStart);
     if( frameTime < Game.delay_time ){
+      //writeln(Game.delay_time-frameTime);
       SDL_Delay(cast(int)Game.delay_time-frameTime);
     }
   }

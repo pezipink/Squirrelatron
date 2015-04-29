@@ -1,6 +1,6 @@
 {
-	"name": "squirreltron",
-	"description": "A minimal D application.",
+	"name": "squirrelatron",
+	"description": "A silly game in D / SDL.",
 	"copyright": "Copyright © 2015, ross",
 	"authors": ["ross"],
 	"dependencies": {

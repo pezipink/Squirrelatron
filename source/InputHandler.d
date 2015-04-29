@@ -11,7 +11,7 @@ enum Direction : int
 	BaseLeft 	= 0b0000_0100,
 	BaseRight 	= 0b0000_1000,
 	BaseHoriz	= 0b0000_1100,
-	BaseAll		= 0b0000_1111,
+	BaseAll		= 0b0000_11,
 	TurretUp 	= 0b0001_0000,
 	TurretDown  = 0b0010_0000,
 	TurretVert	= 0b0011_0000,
@@ -38,7 +38,6 @@ unittest {
 	assert(testDirection(Direction.TurretLeft | Direction.TurretDown) == false);
 }
 
-
 private SDL_Joystick* joystick;
 private immutable int deadZone = 10000;
 
@@ -53,38 +52,30 @@ void InitializeJoysticks(){
 }
 
 bool IsKeyDown(SDL_Scancode code){
-	if( _keyState != null ) 
-		if( _keyState[code] == 1 ) 
-			return true;
-	return false;
+	return _keyState[code] == 1;
 }
 
-private string KeyInput() {
-	auto keyMapping = 
-	[
-		"SDL_SCANCODE_RIGHT" : "Direction.BaseRight",
-		"SDL_SCANCODE_LEFT" : "Direction.BaseLeft",
-		"SDL_SCANCODE_UP" : "Direction.BaseUp",
-		"SDL_SCANCODE_DOWN" : "Direction.BaseDown",
-		"SDL_SCANCODE_D" : "Direction.TurretRight",
-		"SDL_SCANCODE_A" : "Direction.TurretLeft",
-		"SDL_SCANCODE_W" : "Direction.TurretUp",
-		"SDL_SCANCODE_S" : "Direction.TurretDown"
-	];
-	string code = "";
-	foreach(k, v; keyMapping){
-		code ~=
-		"if(IsKeyDown("~k~"))
-			directions |= "~v~";
-		 else
-	 		directions &= (directions ^ " ~ v~");
-	 	";
-	 }
- 	return code;
- }
+private template KeyInput(Tuple!(string,string)[] inputs) {
+	static if (inputs.length > 0) 
+		const string KeyInput = 
+			"if(IsKeyDown("~inputs[0][0]~"))
+				directions |= "~inputs[0][1]~";
+			 else
+		 		directions &= (directions ^ " ~ inputs[0][1]~");
+		 	" ~ KeyInput!(inputs[1..$]);
+	
+	else const string KeyInput = "";
+}
 
 private void UpdateKeys(){
-	mixin(KeyInput());
+	mixin(KeyInput!([tuple("SDL_SCANCODE_RIGHT", "Direction.BaseRight"),
+		tuple("SDL_SCANCODE_LEFT", "Direction.BaseLeft"),
+		tuple("SDL_SCANCODE_UP", "Direction.BaseUp"),
+		tuple("SDL_SCANCODE_DOWN", "Direction.BaseDown"),
+		tuple("SDL_SCANCODE_D", "Direction.TurretRight"),
+		tuple("SDL_SCANCODE_A", "Direction.TurretLeft"),
+		tuple("SDL_SCANCODE_W", "Direction.TurretUp"),
+		tuple("SDL_SCANCODE_S", "Direction.TurretDown")]));
 	if(IsKeyDown(SDL_SCANCODE_ESCAPE)) {
 		gameRunning=false;
 	}
