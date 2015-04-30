@@ -1,6 +1,8 @@
 import TextureManager;
 import InputHandler;
 import Vector2D;
+import BulletManager;
+
 import derelict.sdl2.sdl;
 import derelict.sdl2.image;
 import std.math;
@@ -55,8 +57,11 @@ class GameObject : IGameEntity
 		};
 
 		void Clean(){};
+		void SetPosition(Vector2D pos){_position=pos;}
+		void SetVelocity(Vector2D vel){_velocity=vel;}
 
 		@property double PositionAngle() { return _positionAngle; }
+		@property Vector2D Position() { return _position; }
 	protected:
 		string _id;
 		
@@ -76,11 +81,31 @@ class GameObject : IGameEntity
 
 class Player : GameObject
 {
+	BulletManager _bullets = new BulletManager();
+	int _lastFired;
+	this()
+	{
+		_lastFired=SDL_GetTicks();
+	}
+	override void Draw(SDL_Renderer* renderer){
+		GameObject.Draw(renderer);
+		_bullets.Draw(renderer);
+	}
+
 	override void Update()
 	{
+		if(SDL_GetTicks() - _lastFired > 200){
+			auto x = cos(_turretAngle*(PI/180)) ;
+			auto y = sin(_turretAngle*(PI/180)) ;
+			if( x < 0 ) x-=1; else x+=1;
+			if( y < 0 ) y-=1; else y+=1;
+			auto v = new Vector2D(x,y);
+			_bullets.AddBullet(true,_position.dup,v);
+			_lastFired=SDL_GetTicks();
+		}
 		HandleInput();
 		GameObject.Update();
-
+		_bullets.Update();
 		//bounds checking
 		if( _position.X < 0  )
 		{
@@ -107,7 +132,7 @@ class Player : GameObject
 
 	void HandleInput()
 	{
-
+		//mixin("mixin(\"int x;\");");
 		//_positionAngle = WRAPP(_positionAngle+10,360);
 		if( (Direction.BaseLeft | Direction.BaseRight).testDirection)
 		{
@@ -124,17 +149,19 @@ class Player : GameObject
 
 		if( (Direction.BaseUp | Direction.BaseDown).testDirection)
 		{
-			
+			_currentFrame = 0; 
 		}
 		else if(Direction.BaseUp.testDirection)
 		{	
-			_velocity.X = _velocity.X + cos(_positionAngle*(PI/180))*0.05;
-			_velocity.Y = _velocity.Y + sin(_positionAngle*(PI/180))*0.05;
+			_velocity.X = _velocity.X + cos(_positionAngle*(PI/180))*0.3;
+			_velocity.Y = _velocity.Y + sin(_positionAngle*(PI/180))*0.3;
+			_currentFrame = ((SDL_GetTicks() / 100) % 3);
 		}
 		else if(Direction.BaseDown.testDirection)
 		{
-			_velocity.X = _velocity.X - cos(_positionAngle*(PI/180))*0.05;
-			_velocity.Y = _velocity.Y - sin(_positionAngle*(PI/180))*0.05;
+			_velocity.X = _velocity.X - cos(_positionAngle*(PI/180))*0.3;
+			_velocity.Y = _velocity.Y - sin(_positionAngle*(PI/180))*0.3;
+			_currentFrame = ((SDL_GetTicks() / 100) % 3);
 		}
 
 
@@ -143,7 +170,7 @@ class Player : GameObject
 			
 		}
 		else if(Direction.TurretLeft.testDirection)
-		{
+		{			
 			_turretAngle = WRAPN(_turretAngle-5,0,360);
 		}
 		else if(Direction.TurretRight.testDirection)

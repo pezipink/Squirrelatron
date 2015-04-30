@@ -23,6 +23,7 @@ private:
   SDL_Texture* _pezi_tex;
   Player _pezi;
   CircularStarField _stars;
+  PlasmaFractal _plasma;
 public:
   
   void Init()
@@ -32,19 +33,22 @@ public:
     //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
-    TextureManager.Load(buildPath(getcwd(), "..\\images\\ps_temp.png"), "pezi", _renderer);    
+    TextureManager.Load(buildPath(getcwd(), "..\\images\\ps.png"), "pezi", _renderer);    
     SDL_Rect source = TextureManager.GetRect("pezi");
     _pezi = new Player();
-    _pezi.Load(0,0,source.w,source.h,"pezi");
+    _pezi.Load(0,0,32,26,"pezi");
     _stars = new CircularStarField(&_pezi);
+    _plasma = new PlasmaFractal(4);
     gameRunning = true;
   };
   
   void Render() {
     SDL_Rect source = TextureManager.GetRect("pezi");
     SDL_RenderClear(_renderer);
-    _pezi.Draw(_renderer);
     _stars.Draw(_renderer);
+    //_plasma.Draw(_renderer);
+    _pezi.Draw(_renderer);
+    
     SDL_RenderPresent(_renderer);
   };
   

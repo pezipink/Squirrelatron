@@ -1,5 +1,5 @@
 // workshop, cos no one likes a factory
-class Workshop(T, alias creator)
+class ElfWorkshop(T, alias creator)
 {
 	// not sure how effecient this is
 	private T[] pool;
@@ -52,7 +52,7 @@ unittest {
 		this(int x,string y){Test.x=x;Test.y=y;}
 	}
 	string s = "test";
-	auto w = new Workshop!(Test,()=>new Test(1,s))(10);
+	auto w = new ElfWorkshop!(Test,()=>new Test(1,s))(10);
 	auto x = w.Get();
 	assert(x.y=="test");
 	assert(w.pool.length==9);

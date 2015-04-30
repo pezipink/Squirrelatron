@@ -49,6 +49,8 @@ public:
   Vector2D opBinary(string op)(double rhs) if (op == "*" || op == "/") {
     return mixin("new Vector2D(_x"~op~"rhs,_y"~op~"rhs)");
   }
+
+  @property Vector2D dup() { return new Vector2D(_x,_y); }
 }
 
 unittest{
