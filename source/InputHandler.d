@@ -50,7 +50,7 @@ void InitializeJoysticks(){
 		SDL_JoystickEventState(SDL_ENABLE);
 	}
 }
-
+	
 bool IsKeyDown(SDL_Scancode code){
 	return _keyState[code] == 1;
 }

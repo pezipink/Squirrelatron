@@ -2,9 +2,109 @@ import derelict.sdl2.sdl;
 import std.random;
 import std.math;
 import std.random;
+import std.typecons;
 import Vector2D;
 import GameObjects;
 import Interfaces;
+
+class Plasma : IGameEntity{
+
+	private {
+		static immutable int _cellSize = 8;
+		static immutable int _pwidth = 640 / _cellSize;  // 80
+		static immutable int _pheight = 480 / _cellSize; // 40
+		int[_pheight][_pwidth] _colourMap;	double  _t = 1.0;
+		int _lastFrame;
+		rgb[256] _colourIndex;
+		struct rgb {
+			double r,g,b;
+		}
+		enum renderType {
+			Partial = 0,
+			Filled = 1
+		}
+		//green(i) = cos(π * i / 128)
+//blue(i) = sin(π * i / 128)
+//red(i) = cos(π * i / 128)
+	}
+
+	this()
+	{
+		_lastFrame = SDL_GetTicks();
+		for(int i=0;i<256;i++) {
+			 _colourIndex[i].r = abs(sin(PI * i / 32)*200);
+			 _colourIndex[i].g  = abs(sin(PI * i / 64)*200);
+			 _colourIndex[i].b  = abs(sin(PI * i / 128)*200);
+			//std.stdio.writeln(_colourIndex[i].r,_colourIndex[i].g,_colourIndex[i].b);
+		}
+
+		//_colourMap[59][79] = 255;
+	}
+
+	void Update() 
+	{
+		//f(x, y, t) = sin(distance(x, y, (128 * sin(-t) + 128), (128 * cos(-t) + 128)) / 40.74) - which gives the effect of the second pattern rotating around the center of the canvas.
+
+		if((SDL_GetTicks() - _lastFrame > 100)){
+			 _t+=0.1;
+			_lastFrame =SDL_GetTicks();
+		}
+
+
+		double f1(int x ) { return sin( x / 40.74 + _t ) * 256; }
+		double f2(int x, int y) {
+			float xt = 40 * sin(-_t) + 40;
+			float yt = 50 * cos(-_t) + 50;
+			float x2 = (xt-x)*(xt-x);
+			float y2 = (yt-y)*(yt-y);
+			float k = sqrt(cast(float)(x2 + y2 )); 
+			return sin(k / 40.74 ) * 256;
+			//f(x, y) = sin(distance(x, y, 128, 256) / 40.74)
+		}
+		for(int x = 0; x < _pwidth; x++) {
+			auto v = f1(x);
+			for(int y = 0; y < _pheight; y++) {
+				auto v2 = f2(x,y);
+				//_colourMap[x][y] = cast(int)v;
+				//_colourMap[x][y] = cast(int)(v2);
+				_colourMap[x][y] = MAX( cast(int)(v+v2)/2, 0);
+			}
+		}
+	}
+	void Draw(SDL_Renderer* renderer) {
+		SDL_Rect rect;
+		rect.w = _cellSize;
+		rect.h = _cellSize;
+		for(int x = 0; x < _pwidth; x++) {
+			rect.x = x * _cellSize;
+			for(int y = 0; y < _pheight; y++) { 
+				rect.y = y * _cellSize;
+				//std.stdio.writeln(_colourMap[x][y] );
+				ubyte r = cast(ubyte)_colourIndex[_colourMap[x][y]].r;
+				ubyte g = cast(ubyte)_colourIndex[_colourMap[x][y]].g;
+				ubyte b = cast(ubyte)_colourIndex[_colourMap[x][y]].b;
+				SDL_SetRenderDrawColor(renderer,r,g ,b,0);				
+				if( (r == 0 && g == 0 && b == 0) ){
+					SDL_RenderDrawRect(renderer,&rect);	
+				}else{
+				SDL_RenderFillRect(renderer,&rect);
+				}//;
+			}
+		}
+
+	}
+
+}
+
+//red(i) = sin(π * i / 32)
+//green(i) = sin(π * i / 64)
+//blue(i) = sin(π * i / 128)
+//red(i) = 0
+//green(i) = cos(π * i / 128)
+//blue(i) = sin(π * i / 128)
+//red(i) = cos(π * i / 128)
+//green(i) = sin(π * i / 128)
+//blue(i) = 0
 
 class PlasmaFractal : IGameEntity
 {
@@ -30,7 +130,7 @@ class PlasmaFractal : IGameEntity
 	void palette () {
     for(int i=0;i<256;i++)
     {
-        switch(cast(int)(i/64))
+        final switch(cast(int)(i/64))
         {
             case 0:
                 red[i]=(i%64)*3+64;
@@ -105,7 +205,7 @@ class PlasmaFractal : IGameEntity
 
 unittest {
 	auto p = new PlasmaFractal(1);
-	std.stdio.writeln(p._heightmap);
+	//std.stdio.writeln(p._heightmap);
 	assert(true);
 }
 

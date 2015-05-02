@@ -1,3 +1,4 @@
+import std.algorithm;
 // workshop, cos no one likes a factory
 class ElfWorkshop(T, alias creator)
 {
@@ -43,6 +44,14 @@ public:
 	void Put(T[] item) {
 		pool ~= item;
 	}
+
+	T[] Recycle(T[] candidates, bool delegate(T) pred) {
+		auto remainder = candidates.partition!(pred);
+		if(remainder.length == candidates.length)
+			return candidates;
+		pool ~= candidates[0..candidates.length-remainder.length];
+		return remainder;
+	}
 }
 
 unittest {
@@ -68,5 +77,15 @@ unittest {
 	w.Put(x);
 	w.Put(y);
 	assert(w.pool.length==12);
-	
 }
+
+unittest {
+	auto w = new ElfWorkshop!(int,()=>10)(10);
+	auto x = w.Get(5);
+	assert(x.length==5);
+	x[0] = 1;
+	x[4] = 1;
+	auto r = w.Recycle(x,x=>x<10);
+	assert(r.length==3);
+	assert(w.Recycle([],x=>true)==[]);
+}	

@@ -23,14 +23,14 @@ private:
   SDL_Texture* _pezi_tex;
   Player _pezi;
   CircularStarField _stars;
-  PlasmaFractal _plasma;
+  Plasma _plasma;
 public:
   
   void Init()
   {
     SDL_Init(SDL_INIT_EVERYTHING);  
     _window = SDL_CreateWindow("Squirrelatron", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,640,480,SDL_WINDOW_SHOWN);
-    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
     TextureManager.Load(buildPath(getcwd(), "..\\images\\ps.png"), "pezi", _renderer);    
@@ -38,7 +38,7 @@ public:
     _pezi = new Player();
     _pezi.Load(0,0,32,26,"pezi");
     _stars = new CircularStarField(&_pezi);
-    _plasma = new PlasmaFractal(4);
+    _plasma = new Plasma();
     gameRunning = true;
   };
   
@@ -46,7 +46,7 @@ public:
     SDL_Rect source = TextureManager.GetRect("pezi");
     SDL_RenderClear(_renderer);
     _stars.Draw(_renderer);
-    //_plasma.Draw(_renderer);
+    _plasma.Draw(_renderer);
     _pezi.Draw(_renderer);
     
     SDL_RenderPresent(_renderer);
@@ -55,6 +55,7 @@ public:
   void Update() {
     _pezi.Update();    
     _stars.Update();
+    _plasma.Update();
     //auto frame = ((SDL_GetTicks() / 1000) % 6);
   };
   

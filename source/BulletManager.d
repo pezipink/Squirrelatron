@@ -2,7 +2,6 @@ import derelict.sdl2.sdl;
 
 import std.container;
 import std.algorithm;
-import std.algorithm;
 import std.range;
 import Workshop;
 import GameObjects;
@@ -21,15 +20,14 @@ class BulletManager
 {
 	private auto bulletShop = new ElfWorkshop!(Bullet,()=>new Bullet())(100);
 
-	private auto bulletsInPlay =  SList!(Bullet)();
+	private Bullet[] bulletsInPlay = [];
 
 	void Update(){
-		foreach(b; bulletsInPlay) {
+		foreach(b; bulletsInPlay)
 			b.Update();
 
-			}
-		//auto r = bulletsInPlay.filter!(a=>true);		
-		//bulletsInPlay.linearRemove(r);		
+		bulletsInPlay = bulletShop.Recycle(bulletsInPlay,b=>false); // todo
+
 	}
 
 	void Draw(SDL_Renderer* renderer){	
@@ -45,6 +43,14 @@ class BulletManager
 		b.SetPosition(position);
 		b.SetVelocity(velocity);
 		auto x = b.Position;
-		bulletsInPlay.insert(b);
+		bulletsInPlay~=b;
 	}
+}
+import std.range;
+import std.traits;
+
+unittest {
+	//auto x = SList!(Bullet);
+	//assert(isInputRange!(Unqual!Range)(x));
+
 }
