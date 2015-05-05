@@ -22,28 +22,26 @@ public:
 
   @property length() { return sqrt(_x * _x + _y * _y); }
 
-  void Normalize()
-  {
-      if(length>0)
-      {
-        (this) *=1 / length;
-      }
-  }
+  //void Normalize()
+  //{
+  //    if(length>0)
+  //    {
+  //      (this) *=1 / length;
+  //    }
+  //}
 
   Vector2D opBinary(string op)(Vector2D rhs) if (op == "+" || op == "-") {    
     return mixin("new Vector2D(_x"~op~"rhs.X,_y"~op~"rhs.Y)");
   }
 
-  ref Vector2D opOpAssign(string op)(double rhs) if (op == "*" || op == "/") {    
+  void  opOpAssign(string op)(double rhs) if (op == "*" || op == "/") {    
     mixin("_x"~op~"=rhs;");
     mixin("_y"~op~"=rhs;");
-    return this;
   }
 
-  ref Vector2D opOpAssign(string op)(Vector2D rhs) if (op == "+" || op == "-") {    
+  void opOpAssign(string op)(Vector2D rhs) if (op == "+" || op == "-") {    
     mixin("_x"~op~"=rhs.X;");
     mixin("_y"~op~"=rhs.Y;");
-    return this;
   }
 
   Vector2D opBinary(string op)(double rhs) if (op == "*" || op == "/") {

@@ -30,7 +30,7 @@ public:
   {
     SDL_Init(SDL_INIT_EVERYTHING);  
     _window = SDL_CreateWindow("Squirrelatron", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,640,480,SDL_WINDOW_SHOWN);
-    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
     TextureManager.Load(buildPath(getcwd(), "..\\images\\ps.png"), "pezi", _renderer);    

@@ -6,6 +6,7 @@ import std.typecons;
 import Vector2D;
 import GameObjects;
 import Interfaces;
+import InputHandler;
 
 class Plasma : IGameEntity{
 
@@ -16,6 +17,9 @@ class Plasma : IGameEntity{
 		int[_pheight][_pwidth] _colourMap;	double  _t = 1.0;
 		int _lastFrame;
 		rgb[256] _colourIndex;
+		double _plasmaX = _pwidth/2;
+		double _plasmaY =_pheight/2;
+
 		struct rgb {
 			double r,g,b;
 		}
@@ -32,9 +36,9 @@ class Plasma : IGameEntity{
 	{
 		_lastFrame = SDL_GetTicks();
 		for(int i=0;i<256;i++) {
-			 _colourIndex[i].r = abs(sin(PI * i / 32)*200);
-			 _colourIndex[i].g  = abs(sin(PI * i / 64)*200);
-			 _colourIndex[i].b  = abs(sin(PI * i / 128)*200);
+			 _colourIndex[i].r = abs(sin(PI * i / 32)*200)/2;
+			 _colourIndex[i].g  = abs(sin(PI * i / 64)*200)/2;
+			 _colourIndex[i].b  = abs(sin(PI * i / 128)*200)/2;
 			//std.stdio.writeln(_colourIndex[i].r,_colourIndex[i].g,_colourIndex[i].b);
 		}
 
@@ -45,16 +49,24 @@ class Plasma : IGameEntity{
 	{
 		//f(x, y, t) = sin(distance(x, y, (128 * sin(-t) + 128), (128 * cos(-t) + 128)) / 40.74) - which gives the effect of the second pattern rotating around the center of the canvas.
 
+		//if(testDirection(Direction.BaseRight)){
+		//	_plasmaX=MAX(_plasmaX-0.5, 0.1);
+		//}
+
+		//if(testDirection(Direction.BaseLeft)){
+		//	_plasmaX=MIN(_plasmaX+0.5, 600.0);
+		//}
 		if((SDL_GetTicks() - _lastFrame > 100)){
 			 _t+=0.1;
+			 std.stdio.writeln(_t);
+			 if(_t==100.0) {_t=0.1; std.stdio.writeln("!");}
 			_lastFrame =SDL_GetTicks();
 		}
 
-
 		double f1(int x ) { return sin( x / 40.74 + _t ) * 256; }
 		double f2(int x, int y) {
-			float xt = 40 * sin(-_t) + 40;
-			float yt = 50 * cos(-_t) + 50;
+			float xt = _plasmaX * sin(-_t) + _plasmaX;
+			float yt = _plasmaY * cos(-_t) + _plasmaY;
 			float x2 = (xt-x)*(xt-x);
 			float y2 = (yt-y)*(yt-y);
 			float k = sqrt(cast(float)(x2 + y2 )); 

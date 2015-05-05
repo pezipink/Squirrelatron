@@ -1,6 +1,7 @@
 import derelict.sdl2.sdl;
 import std.stdio;
 import std.algorithm;
+import std.typecons;
 
 enum Direction : int
 {

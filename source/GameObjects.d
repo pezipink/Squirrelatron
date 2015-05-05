@@ -94,7 +94,7 @@ class Player : GameObject
 
 	override void Update()
 	{
-		if(SDL_GetTicks() - _lastFired > 200){
+		if(SDL_GetTicks() - _lastFired > 1000){
 			auto x = cos(_turretAngle*(PI/180)) ;
 			auto y = sin(_turretAngle*(PI/180)) ;
 			if( x < 0 ) x-=1; else x+=1;
