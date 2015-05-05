@@ -25,3 +25,9 @@ byte[27] =
 //0xFF0000,//Blue mask
 //0);      //Alpha mask (no alpha in this format)
 //  
+
+       //for (var i = 0; i < width * height; i++)
+       // {
+       //     var mask = 1 << i;
+       //     pixels.push(index & mask);
+       // }
