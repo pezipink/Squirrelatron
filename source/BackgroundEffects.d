@@ -58,8 +58,8 @@ class Plasma : IGameEntity{
 		//}
 		if((SDL_GetTicks() - _lastFrame > 100)){
 			 _t+=0.1;
-			 std.stdio.writeln(_t);
-			 if(_t==100.0) {_t=0.1; std.stdio.writeln("!");}
+//			 std.stdio.writeln(_t);
+			 //if(_t==100.0) {_t=0.1; std.stdio.writeln("!");}
 			_lastFrame =SDL_GetTicks();
 		}
 
@@ -255,11 +255,11 @@ class CircularStarField : IGameEntity
 	void Update(){
 		
 		double newAngle = 0.0;
-		if( _player.PositionAngle != _lastAngle)
-		{
-			newAngle = _player.PositionAngle;
-			_lastAngle = _player.PositionAngle;
-		}		
+		//if( _player.PositionAngle != _lastAngle)
+		//{
+		//	newAngle = _player.PositionAngle;
+		//	_lastAngle = _player.PositionAngle;
+		//}		
 		foreach(star;_stars){
 			star.position += star.velocity;
 			if( newAngle > 0.0 ){

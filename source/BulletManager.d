@@ -14,6 +14,9 @@ class Bullet : GameObject{
 		auto v = _position + (_velocity*10);
 		SDL_RenderDrawLine(renderer,cast(int)_position.X,cast(int)_position.Y,cast(int)v.X,cast(int)v.Y);
 	}
+
+	void Fire(int x) { return; }
+
 }
 
 class BulletManager

@@ -22,7 +22,13 @@ unittest {
 class GameObject : IGameEntity
 {
 	public:
-		void Load(int x,int y, int width, int height, immutable string id) {
+		this()
+		{
+			_position = new Vector2D(0,0);
+			_velocity = new Vector2D(0,0);
+			
+		}
+		void Load(int x,int y, int width, int height, float angle, immutable string id) {
 			_position.X = x;
 			_position.Y = y;
 			_width=width;
@@ -30,24 +36,13 @@ class GameObject : IGameEntity
 			_id=id;
 			_currentFrame=0;
 			_currentRow=0;
+			_positionAngle = angle;
+
 		}
 		
 		void Draw(SDL_Renderer* renderer) {
-			TextureManager.DrawFrame(_id,cast(int)_position.X,cast(int)_position.Y,_width,_height,_positionAngle,_currentRow,_currentFrame,renderer,SDL_FLIP_NONE);
+			TextureManager.DrawFrame(_id,cast(int)_position.X,cast(int)_position.Y,cast(int)(_width*_scale),cast(int)(_height*_scale),_positionAngle,_currentRow,_currentFrame,renderer,SDL_FLIP_NONE);
 			SDL_SetRenderDrawColor(renderer,255,0,255,0);
-			//SDL_RenderDrawLine(
-			//	renderer,
-			//	cast(int)_position.X,
-			//	cast(int)_position.Y,
-			//	cast(int)(_position.X + _velocity.X)*2,
-			//	cast(int)(_position.Y + _velocity.Y)*2);
-			SDL_RenderDrawLine(
-				renderer,
-				cast(int)_position.X,
-				cast(int)_position.Y,
-				cast(int)(_position.X  + cos(_turretAngle*(PI/180))*10),
-				cast(int)(_position.Y  + sin(_turretAngle*(PI/180))*10));
-
 			SDL_SetRenderDrawColor(renderer,0,0,0,0);
 		}
 
@@ -59,6 +54,7 @@ class GameObject : IGameEntity
 		void Clean(){};
 		void SetPosition(Vector2D pos){_position=pos;}
 		void SetVelocity(Vector2D vel){_velocity=vel;}
+		void SetScale(double scale){_scale=scale;}
 
 		@property double PositionAngle() { return _positionAngle; }
 		@property Vector2D Position() { return _position; }
@@ -71,16 +67,17 @@ class GameObject : IGameEntity
 		int _width;
 		int _height;
 
-		Vector2D _position = new Vector2D(0,0);
-		Vector2D _velocity = new Vector2D(0,0);
-
+		Vector2D _position ;
+		Vector2D _velocity ;
 		double _positionAngle = 0.0;
-		double _turretAngle = 0.0;
-
+		double _scale  = 1.0;
 }
 
 class Player : GameObject
 {
+
+	private double _turretAngle = 0.0;
+
 	BulletManager _bullets = new BulletManager();
 	int _lastFired;
 	this()
@@ -179,4 +176,18 @@ class Player : GameObject
 		}
 
 	}
+}
+
+
+class Invader : GameObject
+{
+	private int  _spinRate;
+	this(int spinRate){
+		_spinRate=spinRate;
+	}
+
+	override void Update(){
+		GameObject.Update();
+		_positionAngle = WRAPP(_positionAngle+_spinRate,360);
+	} 
 }

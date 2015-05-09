@@ -1,8 +1,11 @@
 import std.algorithm;
 // workshop, cos no one likes a factory
-class ElfWorkshop(T, alias creator)
+class ElfWorkshop(T, alias creator) 
+	if(new T() !is null ) 
 {
-	// not sure how effecient this is
+	// dynamic array will do for now, this design needs changing so the 
+	// workshop keeps track of all objects and which ones are dead / alive
+	// using a free list w/union based linked list to conserve memory
 	private T[] pool;
 	this(int initialPool)
 	{

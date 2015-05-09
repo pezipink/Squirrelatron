@@ -5,6 +5,12 @@ import derelict.sdl2.image;
 
 private SDL_Texture*[string] _textures;
 
+void Load(SDL_Texture* tex, immutable string id)
+{
+  assert(!(id in _textures));
+  _textures[id] = tex;
+}
+
 void Load(immutable string file, immutable string id, SDL_Renderer* renderer)
 {
   assert(!(id in _textures));
@@ -15,8 +21,9 @@ void Load(immutable string file, immutable string id, SDL_Renderer* renderer)
   _textures[id] = tex;
 }
 
-void Draw(immutable string id, int x,int y, int width, int height, double angle, SDL_Renderer* renderer, SDL_RendererFlip flip = SDL_FLIP_NONE)
-{
+void Draw(immutable string id, in int x, in int y, in int width, in int height, in double angle, SDL_Renderer* renderer, SDL_RendererFlip flip = SDL_FLIP_NONE, in float scale = 1.0)
+{ 
+  
   assert(id in _textures);
   SDL_Rect srcRect;
   SDL_Rect destRect;
@@ -26,6 +33,8 @@ void Draw(immutable string id, int x,int y, int width, int height, double angle,
   srcRect.h = destRect.h = height;
   destRect.x = x;
   destRect.y = y;
+  destRect.w *= scale;
+  destRect.h *= scale;
   SDL_RenderCopyEx(renderer, _textures[id], &srcRect, &destRect, angle, null, flip);
 }
 
