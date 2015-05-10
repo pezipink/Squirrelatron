@@ -1,4 +1,16 @@
 import std.algorithm;
+
+class ObjectPool(T, alias initializer, int initialSize) {
+
+	T[] items;
+
+	this(){
+		items.size = initialSize;
+	}
+
+}
+
+
 // workshop, cos no one likes a factory
 class ElfWorkshop(T, alias creator) 
 	if(new T() !is null ) 

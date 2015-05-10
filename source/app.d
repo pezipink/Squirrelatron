@@ -19,10 +19,6 @@ class Game
 private:
   static immutable int fps = 60;
   static immutable float delay_time = 1000.0 / fps;
-  static immutable int invader_width = 3;
-  static immutable int invader_height = 5;
-  static immutable int invader_full_width = invader_width * 2 - 1;
-  static immutable int max_invaders = 2 ^^ (invader_width * invader_height);
   SDL_Window* _window;
   SDL_Renderer* _renderer;
   SDL_Texture* _pezi_tex;
@@ -31,9 +27,8 @@ private:
   Plasma _plasma;
   string[max_invaders] _invadersMap;
   int _currentInvader = 0;
-  GameObject[30] _invaders; 
+  Invader[30] _invaders; 
 public:
-  
   void Init()
   {
     SDL_Init(SDL_INIT_EVERYTHING);  
@@ -42,20 +37,18 @@ public:
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
     TextureManager.Load(buildPath(getcwd(), "..\\images\\ps.png"), "pezi", _renderer);    
+    TextureManager.Load(GetInvaderTexture(_renderer),  "invaders");    
+    
     SDL_Rect source = TextureManager.GetRect("pezi");
     _pezi = new Player();
     _pezi.Load(0,0,32,26,0.0,"pezi");
     _stars = new CircularStarField(&_pezi);
     _plasma = new Plasma();
-    for(int i = 0; i < max_invaders; i++ ){      
-      auto key =  "invaders" ~ std.conv.to!string(i);
-      TextureManager.Load(Invaders.GetInvader!(invader_width,invader_height)(_renderer,i),key);
-      _invadersMap[i] = key;  
-    }
+    
 
     for(int i =0; i <30; i++){
-        _invaders[i] = new Invader(uniform(1,5));
-        _invaders[i].Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),_invadersMap[uniform(0,max_invaders)]);
+        _invaders[i] = new Invader(uniform(1,5),uniform(0,max_invaders));
+        _invaders[i].Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),"invaders");
         _invaders[i].SetVelocity(new Vector2D(0.0,uniform(0.5,2.5)));
         _invaders[i].SetScale(4.0);
     }
@@ -97,8 +90,9 @@ public:
     foreach(i;_invaders) { 
       i.Update();
       if( i.Position.Y > 480) {
-        i.Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),_invadersMap[uniform(0,max_invaders)]);
-        
+        i.SetInvaderIndex(uniform(0,max_invaders));
+        i.Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),"invaders");
+        i.SetScale(uniform(1.0,8.0));
       }
     }
     //auto frame = ((SDL_GetTicks() / 1000) % 6);

@@ -182,10 +182,14 @@ class Player : GameObject
 class Invader : GameObject
 {
 	private int  _spinRate;
-	this(int spinRate){
+	this(int spinRate, int invaderIndex){
 		_spinRate=spinRate;
+		_currentFrame=invaderIndex;
 	}
 
+	public void SetInvaderIndex(int invaderIndex) {
+		_currentFrame=invaderIndex;
+	}
 	override void Update(){
 		GameObject.Update();
 		_positionAngle = WRAPP(_positionAngle+_spinRate,360);
