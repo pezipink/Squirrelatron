@@ -69,38 +69,38 @@ public:
 	}
 }
 
-unittest {
-	class Test{
-		int x;
-		string y;
-		this(int x,string y){Test.x=x;Test.y=y;}
-	}
-	string s = "test";
-	auto w = new ElfWorkshop!(Test,()=>new Test(1,s))(10);
-	auto x = w.Get();
-	assert(x.y=="test");
-	assert(w.pool.length==9);
-	auto y = w.Get(5);
-	assert(w.pool.length==4);
-	assert(y.length == 5);
-	auto z = w.Get(6);
-	assert(w.pool.length==0);
-	assert(z.length == 6);
-	w.Put(z);
-	assert(z.length == 6);
-	assert(w.pool.length==6);
-	w.Put(x);
-	w.Put(y);
-	assert(w.pool.length==12);
-}
+//unittest {
+//	class Test{
+//		int x;
+//		string y;
+//		this(int x,string y){Test.x=x;Test.y=y;}
+//	}
+//	string s = "test";
+//	auto w = new ElfWorkshop!(Test,()=>new Test(1,s))(10);
+//	auto x = w.Get();
+//	assert(x.y=="test");
+//	assert(w.pool.length==9);
+//	auto y = w.Get(5);
+//	assert(w.pool.length==4);
+//	assert(y.length == 5);
+//	auto z = w.Get(6);
+//	assert(w.pool.length==0);
+//	assert(z.length == 6);
+//	w.Put(z);
+//	assert(z.length == 6);
+//	assert(w.pool.length==6);
+//	w.Put(x);
+//	w.Put(y);
+//	assert(w.pool.length==12);
+//}
 
-unittest {
-	auto w = new ElfWorkshop!(int,()=>10)(10);
-	auto x = w.Get(5);
-	assert(x.length==5);
-	x[0] = 1;
-	x[4] = 1;
-	auto r = w.Recycle(x,x=>x<10);
-	assert(r.length==3);
-	assert(w.Recycle([],x=>true)==[]);
-}	
+//unittest {
+//	auto w = new ElfWorkshop!(int,()=>10)(10);
+//	auto x = w.Get(5);
+//	assert(x.length==5);
+//	x[0] = 1;
+//	x[4] = 1;
+//	auto r = w.Recycle(x,x=>x<10);
+//	assert(r.length==3);
+//	assert(w.Recycle([],x=>true)==[]);
+//}	

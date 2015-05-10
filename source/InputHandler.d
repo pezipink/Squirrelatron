@@ -22,7 +22,8 @@ enum Direction : int
 	TurretAll	= 0b1111_0000,
 	All 		= 0b1111_1111 	
 }
-
+int mousex = 0;
+int mousey = 0;
 
 private int directions = 0;
 
@@ -126,6 +127,11 @@ void Update() {
 
 		break;
 
+		case SDL_MOUSEMOTION:
+			mousex = event.motion.x;
+			mousey = event.motion.y;
+			std.stdio.writeln(mousex, " ", mousey);
+		break;
 	    default:
 	    break;
 	  }

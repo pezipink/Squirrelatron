@@ -8,10 +8,162 @@ import GameObjects;
 import Interfaces;
 import InputHandler;
 
+class Tunnel {
+
+	static immutable int texWidth = 256;
+	static immutable int texHeight = 256;
+	static immutable int screenWidth = 640;
+	static immutable int screenHeight = 480;
+
+	SDL_Color[texHeight][texWidth] texture;
+	int[2*screenHeight][2*screenWidth] distanceTable;
+	int[2*screenHeight][2*screenWidth] angleTable;
+
+	RawPlasma _plasma;
+//	SDL_Surface* _texSurf;
+	void texset(int x, int y, const SDL_Color color)
+	{
+		
+		//std.stdio.writeln(x, " ", y);
+		texture[x][y] = color;
+		
+	}
+
+	void delegate (int x, int y, const SDL_Color color) _pset ;
+	this(void delegate (int x, int y, const SDL_Color color) pset)	{
+		_pset=pset;
+		 import derelict.sdl2.image;
+	//	_texSurf = IMG_Load("F:\\GIT\\Squirrelatron\\images\\tunnel.jpg");
+		// generate a texture
+		
+		for(int x = 0; x < texWidth; x++)
+		for(int y = 0; y < texHeight; y++)
+		{
+		
+			auto c = cast(ubyte)(x ^ y);
+			texture[x][y] = SDL_Color(c,c/2,0,0);
+		}
+		//_plasma = new RawPlasma( &texset );		
+		for(int x = 0; x < screenWidth  * 2; x++)
+	    for(int y = 0; y < screenHeight * 2; y++)
+	    {
+	        int angle, distance;
+	        float ratio = 32.0;
+	        distance = cast(int)(ratio * texHeight / sqrt(cast(real)((x - screenWidth) * (x - screenWidth)) + cast(real)((y - screenHeight) * (y - screenHeight)))) % texHeight;
+	        angle = cast(uint)(0.5 * texWidth * atan2(cast(real)(y - screenHeight),cast(real)(x - screenWidth) ) / 3.1416);
+	        distanceTable[x][y] = distance;
+	        angleTable[x][y] = angle;
+	    }
+	}
+
+	void Draw(){
+		//_plasma.Draw();
+		//_plasma.Update();
+		auto animation = SDL_GetTicks() / 1000.0;
+        int shiftX = cast(int)(texWidth * 1.0 * animation);
+        int shiftY = cast(int)(texHeight * 0.25 * animation);        
+        int shiftLookX = screenWidth / 2 + cast(int)(screenWidth / 2 * sin(animation));
+        int shiftLookY = screenHeight / 2 + cast(int)(screenHeight / 2 * sin(animation * 2.0));
+        for(int x = 0; x < screenWidth; x++)
+        for(int y = 0; y < screenHeight; y++)
+        {
+            //get the texel from the texture by using the tables, shifted with the animation values
+            auto  color = texture[cast(uint)(distanceTable[x+shiftLookX][y+shiftLookY] + shiftX)  % texWidth][cast(uint)(angleTable[x+shiftLookX][y+shiftLookY] + shiftY) % texHeight];
+            _pset(x,y,color);
+            
+        }
+	}
+}
+
+class RawPlasma {
+	double f1_v = 8.0;
+	double f2_v = 8.0;
+	double f2_w = 1.0;
+	double f3_v = 8.0;
+	int[480][640] _colourMap;
+	SDL_Color[256] _colourIndex;
+	uint t = 1;
+	void delegate (int x, int y, const SDL_Color color) _pset ;
+	this(void delegate (int x, int y, const SDL_Color color) pset)	{
+		_pset = pset;
+		for(int i=0;i<256;i++) {
+			 _colourIndex[i].r =  cast(ubyte)abs(sin(PI * i / 32)*200);
+			 _colourIndex[i].g  = cast(ubyte)abs(sin(PI * i / 64)*200);
+			 _colourIndex[i].b  = cast(ubyte)abs(sin(PI * i / 128)*200);
+			//std.stdio.writeln(_colourIndex[i].r,_colourIndex[i].g,_colourIndex[i].b);
+		}
+
+	}
+
+	int F1(int x, int y) {
+		return cast(int)(128.0 + (128.0 * sin(x / f1_v)));
+	}
+
+	int F2(int x, int y) {
+		return cast(int)(128.0 + (128.0 * sin( (x + (y * f2_w)) / f2_v)));
+	}
+
+	int F3(int x, int y) {
+
+		//return cast(int)(128.0 + (128.0 * sin(sqrt((x - 640.0 / 2.0) * (x - 640.0 / 2.0) + (y - 480.0 / 2.0) * (y - 480.0 / 2.0)) / 8.0)));
+
+		auto xa = cast(float)(x - mousex) * (x - mousex);
+		auto ya = cast(float)(y - mousey) * (y - mousey);
+
+		return cast(int)(128.0 + (128.0 * sin(sqrt((xa + ya))/f3_v)));
+	}
+
+	void Draw(){
+		auto shift = cast(int) (SDL_GetTicks() / 10.0);
+		for(int x = 0; x < 640; x++)
+    	for(int y = 0; y < 480; y++)
+    	{
+    	    //auto color = F1(x,y);
+    	    //auto color = F2(x,y);
+    	    //auto color = F3(x,y);
+    	    auto color =  cast(ubyte)(F1(x,y) + F2(x,y) + F3(x,y) / 3);
+    	    //auto index = ((color + shift) % 256); 
+    	    auto index = (color ) ; 
+    	    _pset(x, y, _colourIndex[index]);
+    	}
+    	
+	}
+
+	void Update(){
+		if( Direction.TurretRight.testDirection){
+			f1_v+=0.2;
+		}
+		else if( Direction.TurretLeft.testDirection){
+			f1_v-=0.2;
+		}
+
+if( Direction.TurretUp.testDirection){
+			f3_v+=0.2;
+		}
+		else if( Direction.TurretDown.testDirection){
+			f3_v-=0.2;
+		}
+
+		if( Direction.BaseRight.testDirection){
+			f2_v+=0.2;
+		}
+		else if( Direction.BaseLeft.testDirection){
+			f2_v-=0.2;
+		}
+
+		if( Direction.BaseUp.testDirection){
+			f2_w+=0.2;
+		}
+		else if( Direction.BaseDown.testDirection){
+			f2_w-=0.2;
+		}
+	}
+}
+
 class Plasma : IGameEntity{
 
 	private {
-		static immutable int _cellSize = 8;
+		static immutable int _cellSize = 1;
 		static immutable int _pwidth = 640 / _cellSize;  // 80
 		static immutable int _pheight = 480 / _cellSize; // 40
 		int[_pheight][_pwidth] _colourMap;	double  _t = 1.0;
@@ -83,6 +235,7 @@ class Plasma : IGameEntity{
 			}
 		}
 	}
+	
 	void Draw(SDL_Renderer* renderer) {
 		SDL_Rect rect;
 		rect.w = _cellSize;
