@@ -16,10 +16,6 @@ import Invaders;
 
 immutable auto RGB_Yellow = SDL_Color(255, 255, 0, 0);
 
-static this(){
-
-}
-
 class Game
 {
 private:
@@ -33,24 +29,24 @@ private:
   SDL_Surface* _scr;
   SDL_Texture* _scrTex;
   Player _pezi;
-  CircularStarField _stars;
+  ParallaxStarField _stars;
   Plasma _plasma;
   RawPlasma _rplasma;
   Tunnel _tunnel;
   string[max_invaders] _invadersMap;
-  int _currentInvader = 0;
-  Invader[30] _invaders; 
+  static immutable int _invaderCount = 30;
+  Invader[_invaderCount] _invaders; 
 public:
   void Init()
   {
     
     SDL_Init(SDL_INIT_EVERYTHING);  
     _window = SDL_CreateWindow("Squirrelatron", SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,640,480,SDL_WINDOW_SHOWN);
-    SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(_window,SDL_WINDOW_FULLSCREEN);
     _renderer = SDL_CreateRenderer(_window,-1,0);
     InputHandler.InitializeJoysticks();
     TextureManager.Load(buildPath(getcwd(), "..\\images\\ps.png"), "pezi", _renderer);    
-    TextureManager.Load(GetInvaderTexture(_renderer),  "invaders");    
+
     _scr = SDL_CreateRGBSurface(0, 640, 480, 32,
                                         0x00FF0000,
                                         0x0000FF00,
@@ -61,18 +57,20 @@ public:
                                             SDL_TEXTUREACCESS_STREAMING,
                                             640, 480);
     SDL_Rect source = TextureManager.GetRect("pezi");
+
     _pezi = new Player();
     _pezi.Load(0,0,32,26,0.0,"pezi");
-    _stars = new CircularStarField(&_pezi);
+    _stars = new ParallaxStarField(4,10,1,300,20,50);
     _plasma = new Plasma();
     _rplasma = new RawPlasma(&pset);
     _tunnel  = new Tunnel(&pset);
-
-    for(int i =0; i <30; i++){
-        _invaders[i] = new Invader(uniform(1,5),uniform(0,max_invaders));
-        _invaders[i].Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),"invaders");
-        _invaders[i].SetVelocity(new Vector2D(0.0,uniform(0.5,2.5)));
-        _invaders[i].SetScale(4.0);
+    for(int i =0; i <_invaderCount; i++){
+      int invaderId = uniform(0,max_invaders);
+      string key = TextureManager.LoadInvader(invaderId,_renderer);
+      _invaders[i] = new Invader(uniform(1,5));
+      _invaders[i].Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),key);
+      _invaders[i].SetVelocity(new Vector2D(0.0,uniform(0.5,2.5)));
+      _invaders[i].SetScale(4.0);
     }
 
     gameRunning = true;
@@ -91,14 +89,18 @@ void pset(int x, int y, const SDL_Color color)
 void Render(){
 
   //for(int x=0; x<screen_width; x++) {
-  //  pset(x,50,RGB_Yellow);
+  //  pset(x,50,RGB_Yellow);b
   //}
 
   //_rplasma.Draw();
-  _tunnel.Draw();
+  //_tunnel.Draw();
   SDL_UpdateTexture(_scrTex, null, _scr.pixels, _scr.pitch);
   SDL_RenderClear(_renderer);
   SDL_RenderCopy(_renderer, _scrTex, null, null);
+  foreach(i;_invaders) i.Draw(_renderer);
+  _pezi.Draw(_renderer);
+  _stars.Draw(_renderer);
+  // 
   //_plasma.Draw(_renderer);
   SDL_RenderPresent(_renderer);
 }
@@ -134,14 +136,14 @@ void Render(){
     //  _currentInvader = MAX(_currentInvader-1,0);
     //}
     _rplasma.Update();
-    _pezi.Update();    
+    //_pezi.Update();    
     _stars.Update();
     //_plasma.Update();
     foreach(i;_invaders) { 
       i.Update();
       if( i.Position.Y > 480) {
-        i.SetInvaderIndex(uniform(0,max_invaders));
-        i.Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),"invaders");
+        string key = LoadInvader(uniform(0,max_invaders),_renderer);
+        i.Load(uniform(0,640),0,invader_full_width,invader_height,uniform(0.0,359.0),key);
         i.SetScale(uniform(1.0,8.0));
       }
     }

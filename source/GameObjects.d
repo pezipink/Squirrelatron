@@ -42,8 +42,8 @@ class GameObject : IGameEntity
 		
 		void Draw(SDL_Renderer* renderer) {
 			TextureManager.DrawFrame(_id,cast(int)_position.X,cast(int)_position.Y,cast(int)(_width*_scale),cast(int)(_height*_scale),_positionAngle,_currentRow,_currentFrame,renderer,SDL_FLIP_NONE);
-			SDL_SetRenderDrawColor(renderer,255,0,255,0);
-			SDL_SetRenderDrawColor(renderer,0,0,0,0);
+			//SDL_SetRenderDrawColor(renderer,255,0,255,0);
+			//SDL_SetRenderDrawColor(renderer,0,0,0,0);
 		}
 
 		void Update()
@@ -182,16 +182,17 @@ class Player : GameObject
 class Invader : GameObject
 {
 	private int  _spinRate;
-	this(int spinRate, int invaderIndex){
+	this(int spinRate){
 		_spinRate=spinRate;
-		_currentFrame=invaderIndex;
 	}
 
-	public void SetInvaderIndex(int invaderIndex) {
-		_currentFrame=invaderIndex;
-	}
 	override void Update(){
 		GameObject.Update();
 		_positionAngle = WRAPP(_positionAngle+_spinRate,360);
-	} 
+	}
+
+	//override void Draw(SDL_Renderer* renderer) {
+	//	std.stdio.writeln(_id);
+	//	GameObject.Draw(renderer);
+	//} 
 }
